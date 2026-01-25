@@ -12,3 +12,12 @@ venv/
 env/
 ENV/
 *.log
+
+# Test files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
