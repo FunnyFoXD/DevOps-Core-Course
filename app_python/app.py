@@ -34,13 +34,14 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 # Application start time
 START_TIME = datetime.now(timezone.utc)
 
+
 def get_system_info() -> Dict[str, Any]:
     """Collect system information"""
     try:
         platform_info = platform.platform()
     except Exception:
         platform_info = platform.system()
-    
+
     return {
         'hostname': socket.gethostname(),
         'platform': platform.system(),
@@ -57,26 +58,27 @@ def get_uptime() -> Dict[str, Any]:
     total_seconds = int(delta.total_seconds())
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
-    
+
     return {
         'seconds': total_seconds,
-        'human': f"{hours} hour{'s' if hours != 1 else ''}, {minutes} minute{'s' if minutes != 1 else ''}"
-    }
+        'human': f"{hours} hour{
+            's' if hours != 1 else ''}, {minutes} minute{
+            's' if minutes != 1 else ''}"}
 
 
 @app.get("/")
 async def index(request: Request) -> Dict[str, Any]:
     """Main endpoint - service and system information"""
     logger.info(f"Request: {request.method} {request.url.path}")
-    
+
     uptime = get_uptime()
-    
+
     # Get client IP
     client_ip = request.client.host if request.client else "unknown"
-    
+
     # Get user agent
     user_agent = request.headers.get('user-agent', 'unknown')
-    
+
     return {
         "service": {
             "name": "devops-info-service",
@@ -108,7 +110,7 @@ async def index(request: Request) -> Dict[str, Any]:
 async def health() -> Dict[str, Any]:
     """Health check endpoint for monitoring"""
     uptime = get_uptime()
-    
+
     return {
         "status": "healthy",
         "timestamp": datetime.now(timezone.utc).isoformat(),
