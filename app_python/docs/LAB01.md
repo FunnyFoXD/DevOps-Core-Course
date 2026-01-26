@@ -277,3 +277,20 @@ Starring repositories serves multiple purposes in open source development. First
 
 **How Following Developers Helps**
 Following developers on GitHub is valuable for both team collaboration and professional growth. In team projects, following classmates allows you to stay updated on their work, discover new approaches to problems, and build a supportive learning community. It makes it easier to find potential collaborators for future projects and creates opportunities for knowledge sharing. From a professional development perspective, following experienced developers and thought leaders exposes you to high-quality code, innovative solutions, and industry trends in real-time. You can learn from their commit patterns, project structures, and problem-solving approaches, which accelerates your own growth as a developer. This networking also helps build your professional presence in the developer community, as your GitHub activity shows employers your interests, engagement, and commitment to continuous learning
+
+## Actions Required
+1) Star the course repository [Done]
+2) Star the simple-container-com/api project — a promising open-source tool for container management [Done]
+3) Follow your professor and TAs on GitHub: [Done]
+```
+- Professor: @Cre-eD
+- TA: @marat-biriushev
+- TA: @pierrepicaud
+```
+4) Follow at least 3 classmates from the course: [Done]
+```
+- Abraham14711
+- projacktor
+- asqarslanov
+- Woolfer0097
+```
