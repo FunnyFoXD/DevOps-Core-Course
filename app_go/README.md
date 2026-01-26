@@ -4,7 +4,7 @@ A compiled language implementation of the DevOps Info Service, built with Go.
 
 ## Overview
 
-This is the Go version of the DevOps Info Service, providing the same functionality as the Python version but compiled to a single binary executable
+This is the Go version of the DevOps Info Service, providing the same functionality as the Python version but compiled to a single binary executable. Handle 404 error
 
 ## Prerequisites
 

@@ -11,6 +11,12 @@ import (
 	"time"
 )
 
+// Error response structure
+type ErrorResponse struct {
+	Error   string `json:"error"`
+	Message string `json:"message"`
+}
+
 // Service metadata
 type Service struct {
 	Name        string `json:"name"`
@@ -135,6 +141,23 @@ func getClientIP(r *http.Request) string {
 	return "unknown"
 }
 
+// NotFound handler for 404 errors
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotFound)
+
+	response := ErrorResponse{
+		Error:   "Not Found",
+		Message: "Endpoint does not exist",
+	}
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error encoding JSON: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}
+
 // Main endpoint handler
 func mainHandler(w http.ResponseWriter, r *http.Request) {
 	uptimeSeconds, uptimeHuman := getUptime()
@@ -174,6 +197,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(info); err != nil {
 		log.Printf("Error encoding JSON: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -191,13 +215,21 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		log.Printf("Error encoding JSON: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 }
 
 func main() {
 	// Registers handlers
-	http.HandleFunc("/", mainHandler)
 	http.HandleFunc("/health", healthHandler)
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			mainHandler(w, r)
+		} else {
+			notFoundHandler(w, r)
+		}
+	})
 
 	// Get port and host from env variable
 	host := os.Getenv("HOST")
