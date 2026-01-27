@@ -136,6 +136,10 @@ curl http://localhost:5000/
 curl http://localhost:5000/ | jq
 ```
 
+**Screenshots:**
+![Main Endpoint](docs/screenshots/01-main-endpoint.png)
+![Formatted Output](docs/screenshots/03-formatted-output.png)
+
 ### `GET /health`
 
 Health check endpoint for monitoring and Kubernetes probes
@@ -158,6 +162,9 @@ curl http://localhost:5000/health | jq
 # - 200 OK - Service is healthy
 # - 503 Service Unavailable - Service is not healthy
 ```
+
+**Screenshot:**
+![Health Check](docs/screenshots/02-health-check.png)
 
 ## Configuration
 

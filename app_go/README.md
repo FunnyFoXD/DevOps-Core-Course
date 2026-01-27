@@ -4,7 +4,7 @@ A compiled language implementation of the DevOps Info Service, built with Go.
 
 ## Overview
 
-This is the Go version of the DevOps Info Service, providing the same functionality as the Python version but compiled to a single binary executable. Handle 404 error
+This is the Go version of the DevOps Info Service, providing the same functionality as the Python version but compiled to a single binary executable.
 
 ## Prerequisites
 
@@ -94,7 +94,10 @@ GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o devops-info-service-windo
 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o devops-info-service-macos main.go
 
 # ARM64 (for Raspberry Pi, etc.)
-GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o devops-info-service-arm64 main.go## Running
+GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o devops-info-service-arm64 main.go
+```
+
+## Running
 ```
 
 ### Run from Source
@@ -122,7 +125,88 @@ HOST=127.0.0.1 PORT=8080 ./devops-info-service
 $env:HOST="127.0.0.1"; $env:PORT=8080; .\devops-info-service.exe
 
 # Windows CMD
-set HOST=127.0.0.1 && set PORT=8080 && devops-info-service.exe## Binary Size Comparison
+set HOST=127.0.0.1 && set PORT=8080 && devops-info-service.exe
+```
+
+## API Endpoints
+
+Same as Python version:
+
+### `GET /`
+
+Returns comprehensive service and system information.
+
+**Response Example:**
+```json
+{
+  "service": {
+    "name": "devops-info-service",
+    "version": "1.0.0",
+    "description": "DevOps course info service",
+    "framework": "Go"
+  },
+  "system": {
+    "hostname": "DESKTOP-ACLPNEC",
+    "platform": "windows",
+    "platform_version": "windows amd64",
+    "architecture": "amd64",
+    "cpu_count": 12,
+    "go_version": "go1.25.1"
+  },
+  "runtime": {
+    "uptime_seconds": 3600,
+    "uptime_human": "1 hour, 0 minutes",
+    "current_time": "2026-01-26T09:17:11Z",
+    "timezone": "UTC"
+  },
+  "request": {
+    "client_ip": "127.0.0.1",
+    "user_agent": "curl/8.9.0",
+    "method": "GET",
+    "path": "/"
+  },
+  "endpoints": [
+    {"path": "/", "method": "GET", "description": "Service information"},
+    {"path": "/health", "method": "GET", "description": "Health check"}
+  ]
+}
+```
+
+**Testing:**
+```bash
+curl http://localhost:5000/
+# Or with JSON formatting
+curl http://localhost:5000/ | jq
+```
+
+**Screenshots:**
+![Main Endpoint](docs/screenshots/01-main-endpoint.png)
+![Formatted Output](docs/screenshots/03-formatted-output.png)
+
+### `GET /health`
+
+Health check endpoint for monitoring and Kubernetes probes.
+
+**Response Example:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-01-26T09:14:49Z",
+  "uptime_seconds": 3600
+}
+```
+
+**Testing:**
+```bash
+curl http://localhost:5000/health
+# Or with JSON formatting
+curl http://localhost:5000/health | jq
+```
+
+**Screenshot:**
+![Health Check](docs/screenshots/02-health-check.png)
+
+## Binary Size Comparison
 ```
 
 ### Go Binary Size
