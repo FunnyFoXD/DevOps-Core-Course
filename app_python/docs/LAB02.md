@@ -65,8 +65,6 @@ The `.dockerignore` excludes:
 - Prevents accidentally copying irrelevant or sensitive files.
 - Keeps the final image cleaner.
 
----
-
 ## Image Information & Decisions
 
 ### Base image choice
@@ -99,8 +97,6 @@ funnyfoxd/devops-info-service   lab02     78cbb8cf35e2   10 minutes ago   141MB
 5. Copy `app.py`
 6. Create `appuser` and switch to non-root
 7. Expose port 5000 and run `python app.py`
-
----
 
 ## Build & Run Process
 
@@ -175,8 +171,6 @@ Status: Image is up to date for funnyfoxd/devops-info-service:lab02
 docker.io/funnyfoxd/devops-info-service:lab02
 ```
 
----
-
 ## Technical Analysis
 
 ### Why this Dockerfile works
@@ -201,7 +195,6 @@ If `COPY app.py .` is placed before dependency installation, then any change to 
 - **Reproducibility**: reduces accidental inclusion of local artifacts (venv, caches).
 - **Security**: avoids shipping editor configs, logs, and other irrelevant files.
 
----
 
 ## Challenges & Solutions
 
