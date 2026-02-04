@@ -88,6 +88,46 @@ HOST=127.0.0.1 PORT=3000 python3 app.py
 DEBUG=true python app.py
 ```
 
+## Docker
+
+### Build image (local)
+
+**Command:**
+```bash
+docker build -t <name>:<tag> .
+```
+
+**Example:**
+```bash
+docker build -t devops-info-service:lab02 .
+```
+
+### Run container
+
+**Command:**
+```bash
+docker run --rm -p <host_port>:<container_port> --name <container_name> <name>:<tag>
+```
+
+**Example (default app port 5000):**
+```bash
+docker run --rm -p 5000:5000 --name devops-info devops-info-service:lab02
+```
+
+### Pull from Docker Hub and run
+
+**Command:**
+```bash
+docker pull <dockerhub_username>/<repo>:<tag>
+docker run --rm -p 5000:5000 <dockerhub_username>/<repo>:<tag>
+```
+
+**Example:**
+```bash
+docker pull funnyfoxd/devops-info-service:lab02
+docker run --rm -p 5000:5000 funnyfoxd/devops-info-service:lab02
+```
+
 ## API Endpoints
 ### `GET /`
 
