@@ -117,5 +117,5 @@ jobs:
         run: |
           echo "Scanning dependencies for vulnerabilities..."
           pip-audit --requirement app_python/requirements.txt --format json --output pip-audit-report.json || true
-          pip-audit --requirement app_python/requirements.txt --format text || true
+          pip-audit --requirement app_python/requirements.txt --format columns || true
           echo "Vulnerability scan completed. Check pip-audit-report.json for details."
