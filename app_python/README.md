@@ -215,3 +215,35 @@ The application can be configured using environment variables:
 | `HOST` | `0.0.0.0` | Host address to bind the server |
 | `PORT` | `5000` | Port number to listen on |
 | `DEBUG` | `False` | Enable debug mode |
+
+## Testing
+
+### Running Tests Locally
+
+Install test dependencies
+```bash
+pip install -r requirements.txt
+```
+
+Run tests
+```bash
+pytest
+```
+
+Run with verbose output
+```bash
+pytest -v
+```
+
+Run with coverage (if pytest-cov is installed)
+```bash
+pytest --cov=app --cov-report=term
+```
+
+### Test Structure
+
+Tests are located in `tests/` directory:
+- `test_app.py` - Unit tests for API endpoints
+  - Tests for `GET /` endpoint (JSON structure, fields, types)
+  - Tests for `GET /health` endpoint (status, fields, values)
+  - Error handling tests (404, wrong methods)
