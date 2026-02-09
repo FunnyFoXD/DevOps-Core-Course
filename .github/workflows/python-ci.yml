@@ -1,5 +1,9 @@
 name: Python CI/CD Pipeline
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ main, master, lab03 ]
@@ -105,10 +109,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r app_python/requirements.txt
       
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/python@master
+      - name: Install pip-audit
+        run: pip install pip-audit
+      
+      - name: Run pip-audit for vulnerability scanning
         continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
+        run: |
+          echo "Scanning dependencies for vulnerabilities..."
+          pip-audit --requirement app_python/requirements.txt --format json --output pip-audit-report.json || true
+          pip-audit --requirement app_python/requirements.txt --format text || true
+          echo "Vulnerability scan completed. Check pip-audit-report.json for details."

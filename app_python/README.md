@@ -1,5 +1,7 @@
 # DevOps Info Service
 
+[![CI](https://github.com/FunnyFoXD/DevOps-Core-Course/workflows/Python%20CI%2FCD%20Pipeline/badge.svg)](https://github.com/FunnyFoXD/DevOps-Core-Course/actions/workflows/python-ci.yml)
+
 A web service that provides information about itself and its runtime environment. Built with FastAPI for the DevOps course.
 
 ## Overview
