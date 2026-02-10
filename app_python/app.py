@@ -61,9 +61,7 @@ def get_uptime() -> Dict[str, Any]:
 
     return {
         'seconds': total_seconds,
-        'human': f"{hours} hour{
-            's' if hours != 1 else ''}, {minutes} minute{
-            's' if minutes != 1 else ''}"}
+        'human': f"{hours} hour{'s' if hours != 1 else ''}, {minutes} minute{'s' if minutes != 1 else ''}"}
 
 
 @app.get("/")

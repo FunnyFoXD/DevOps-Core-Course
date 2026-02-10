@@ -56,7 +56,7 @@ temp_*.txt
 *.tmp
 *.bak
 
-# Go (if needed)
+# Go
 *.exe
 *.exe~
 *.dll
