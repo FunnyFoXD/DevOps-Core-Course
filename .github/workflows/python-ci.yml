@@ -56,7 +56,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./app_python/coverage.xml
+          files: ./app_python/coverage.xml
           flags: python
           name: python-coverage
           fail_ci_if_error: false

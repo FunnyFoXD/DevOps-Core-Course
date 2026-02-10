@@ -33,7 +33,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-          cache-dependency-path: app_go/go.sum
       
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
@@ -54,7 +53,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./app_go/coverage.out
+          files: ./app_go/coverage.out
           flags: go
           name: go-coverage
           fail_ci_if_error: false
