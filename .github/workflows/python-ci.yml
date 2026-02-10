@@ -54,10 +54,9 @@ jobs:
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
-        working-directory: app_python
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+          file: ./app_python/coverage.xml
           flags: python
           name: python-coverage
           fail_ci_if_error: false
