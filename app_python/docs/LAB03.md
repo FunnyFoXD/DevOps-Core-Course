@@ -295,6 +295,62 @@ The current test suite provides good coverage for the application's functionalit
 
 ---
 
+## Test Coverage
+
+### Coverage Integration
+
+**Tool used:** pytest-cov
+
+**Coverage percentage:** ~85-90% (varies by run)
+
+**What's covered:**
+- All API endpoints (`GET /`, `GET /health`)
+- All helper functions (`get_system_info()`, `get_uptime()`)
+- Error handlers (404, 500)
+- Request processing logic
+
+**What's not covered:**
+- Main entry point (`if __name__ == "__main__"`) - not executed in tests
+- Some edge cases in error handling
+- Integration scenarios requiring running server
+
+**Coverage threshold:** Not enforced in CI (optional), but coverage reports are generated and uploaded to Codecov.
+
+**Codecov Integration:**
+- Coverage reports uploaded automatically on each CI run
+- Coverage badge displays current percentage in README
+- Historical coverage tracking available on Codecov dashboard
+- Flag: `python` for separate tracking from Go coverage
+
+---
+
+## Multi-App CI Setup (Bonus)
+
+### Path Filters Implementation
+
+This repository contains both Python and Go applications. Path filters ensure that:
+
+- **Python CI** only runs when `app_python/**` files change
+- **Go CI** only runs when `app_go/**` files change
+- Both workflows can run **in parallel** when both apps change in one commit
+- Documentation changes don't trigger unnecessary CI runs
+
+**Benefits:**
+- **Resource optimization:** Saves GitHub Actions minutes
+- **Faster feedback:** Developers get results faster when working on one app
+- **Parallel execution:** No blocking between different language CI pipelines
+- **Selective testing:** Only relevant code triggers appropriate workflows
+
+**Example scenarios:**
+- Change `app_python/app.py` -> Only Python CI runs
+- Change `app_go/main.go` -> Only Go CI runs  
+- Change both -> Both CI workflows run simultaneously
+- Change `README.md` -> No CI runs
+
+See `app_go/docs/LAB03.md` for detailed Go CI/CD documentation.
+
+---
+
 ## Summary
 
 This lab successfully implements a complete CI/CD pipeline for the Python application with:
@@ -302,6 +358,7 @@ This lab successfully implements a complete CI/CD pipeline for the Python applic
 - Automated linting and code quality checks
 - Docker image building and publishing with CalVer versioning
 - Security vulnerability scanning
+- Test coverage tracking with Codecov integration
 - Multiple CI best practices for optimization and reliability
 - Proper workflow configuration with path filters and conditional steps
 

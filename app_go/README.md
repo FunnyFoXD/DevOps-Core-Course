@@ -1,5 +1,8 @@
 # DevOps Info Service (Go)
 
+[![CI](https://github.com/FunnyFoXD/DevOps-Core-Course/workflows/Go%20CI%2FCD%20Pipeline/badge.svg)](https://github.com/FunnyFoXD/DevOps-Core-Course/actions/workflows/go-ci.yml)
+[![codecov](https://codecov.io/gh/FunnyFoXD/DevOps-Core-Course/branch/lab03/graph/badge.svg?flag=go)](https://codecov.io/gh/FunnyFoXD/DevOps-Core-Course)
+
 A compiled language implementation of the DevOps Info Service, built with Go.
 
 ## Overview
