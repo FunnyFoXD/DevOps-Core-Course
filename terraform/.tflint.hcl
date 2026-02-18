@@ -3,10 +3,6 @@ plugin "terraform" {
   preset  = "recommended"
 }
 
-plugin "yandex" {
-  enabled = true
-}
-
 config {
   force = false
 }
