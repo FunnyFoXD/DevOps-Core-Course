@@ -8,7 +8,6 @@ plugin "yandex" {
 }
 
 config {
-  module = true
-  force  = false
+  force = false
 }
 
