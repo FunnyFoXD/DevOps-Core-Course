@@ -44,7 +44,7 @@ variable "ssh_public_key_path" {
 variable "ssh_allowed_cidr" {
   description = "CIDR block allowed for SSH access (restrict to your IP for security)"
   type        = string
-  default     = "0.0.0.0/0"  # WARNING: Change this to your IP for production!
+  default     = "0.0.0.0/0" # WARNING: Change this to your IP for production!
 }
 
 variable "service_account_key_file" {

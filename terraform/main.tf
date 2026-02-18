@@ -1,6 +1,6 @@
 terraform {
   required_version = ">= 1.9"
-  
+
   required_providers {
     yandex = {
       source  = "yandex-cloud/yandex"
@@ -10,8 +10,8 @@ terraform {
 }
 
 provider "yandex" {
-  zone      = var.zone
-  folder_id = var.folder_id
+  zone                     = var.zone
+  folder_id                = var.folder_id
   service_account_key_file = var.service_account_key_file
 }
 
@@ -74,14 +74,14 @@ resource "yandex_compute_instance" "lab04_vm" {
 
   resources {
     cores         = 2
-    core_fraction = 20  # Free tier: 20% of 2 cores
-    memory        = 1    # 1 GB RAM
+    core_fraction = 20 # Free tier: 20% of 2 cores
+    memory        = 1  # 1 GB RAM
   }
 
   boot_disk {
     initialize_params {
       image_id = data.yandex_compute_image.ubuntu.id
-      size     = 10  # 10 GB HDD (free tier)
+      size     = 10 # 10 GB HDD (free tier)
       type     = "network-hdd"
     }
   }
@@ -89,7 +89,7 @@ resource "yandex_compute_instance" "lab04_vm" {
   network_interface {
     subnet_id          = yandex_vpc_subnet.lab04_subnet.id
     security_group_ids = [yandex_vpc_security_group.lab04_sg.id]
-    nat                = true  # Assign public IP
+    nat                = true # Assign public IP
   }
 
   metadata = {
