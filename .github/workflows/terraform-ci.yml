@@ -1,0 +1,99 @@
+name: Terraform CI/CD Pipeline
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ main, master, lab04 ]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-ci.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-ci.yml'
+
+env:
+  TF_VERSION: "1.9.0"
+  TFLINT_VERSION: "latest"
+
+jobs:
+  validate:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+      
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v3
+        with:
+          tflint_version: ${{ env.TFLINT_VERSION }}
+      
+      - name: Terraform Format Check
+        working-directory: terraform
+        run: |
+          echo "Checking Terraform code formatting..."
+          terraform fmt -check -recursive
+          if [ $? -ne 0 ]; then
+            echo "::error::Terraform files are not properly formatted. Run 'terraform fmt' to fix."
+            exit 1
+          fi
+          echo "✓ Format check passed"
+      
+      - name: Terraform Init
+        working-directory: terraform
+        run: |
+          echo "Initializing Terraform..."
+          terraform init -backend=false
+          echo "✓ Initialization complete"
+      
+      - name: Terraform Validate
+        working-directory: terraform
+        run: |
+          echo "Validating Terraform configuration..."
+          terraform validate
+          if [ $? -ne 0 ]; then
+            echo "::error::Terraform validation failed"
+            exit 1
+          fi
+          echo "✓ Validation passed"
+      
+      - name: TFLint Init
+        working-directory: terraform
+        run: |
+          echo "Initializing TFLint plugins..."
+          tflint --init
+          echo "✓ TFLint initialized"
+      
+      - name: Run TFLint
+        working-directory: terraform
+        run: |
+          echo "Running TFLint..."
+          tflint --format compact
+          if [ $? -ne 0 ]; then
+            echo "::error::TFLint found issues"
+            exit 1
+          fi
+          echo "✓ TFLint check passed"
+      
+      - name: Summary
+        run: |
+          echo "## ✅ Terraform Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Code formatting check passed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Terraform validation passed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ TFLint check passed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All Terraform validation checks completed successfully!" >> $GITHUB_STEP_SUMMARY
+
