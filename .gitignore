@@ -65,3 +65,26 @@ temp_*.txt
 *.test
 *.out
 go.work
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+*.tfvars
+.terraform.lock.hcl
+*.tfplan
+
+# Pulumi
+pulumi/venv/
+Pulumi.*.yaml
+.pulumi/
+
+# Cloud credentials
+*.pem
+*.key
+*.json  # Service account keys
+credentials
+.aws/
+.gcp/
+.yandex/
