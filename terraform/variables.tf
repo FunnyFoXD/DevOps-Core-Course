@@ -16,13 +16,6 @@ variable "folder_id" {
   sensitive   = true
 }
 
-variable "yandex_token" {
-  description = "Yandex Cloud OAuth token or service account key"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
 variable "subnet_cidr" {
   description = "CIDR block for subnet"
   type        = string
