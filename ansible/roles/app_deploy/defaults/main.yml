@@ -1,0 +1,6 @@
+---
+# Application container defaults (override in group_vars/all.yml via Vault)
+app_port: 5000
+restart_policy: unless-stopped
+# Optional env vars for the container
+app_env: {}
