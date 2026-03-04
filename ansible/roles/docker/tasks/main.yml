@@ -66,9 +66,7 @@
         name: "{{ docker_group_user }}"
         groups: docker
         append: true
-
     - name: Install Docker Python SDK for Ansible docker modules
       ansible.builtin.pip:
         name: "docker>=7.0.0"
         state: present
-

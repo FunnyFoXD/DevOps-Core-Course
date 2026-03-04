@@ -16,10 +16,9 @@
         state: present
 
   rescue:
-    - name: Fix apt cache issues with --fix-missing
-      ansible.builtin.shell: apt-get update --fix-missing
-      args:
-        warn: false
+    - name: Retry apt cache update after failure
+      ansible.builtin.apt:
+        update_cache: true
 
   always:
     - name: Log completion of common package management
