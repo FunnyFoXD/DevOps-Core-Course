@@ -13,3 +13,8 @@ common_packages:
 
 # Timezone (optional)
 common_timezone: "Europe/Moscow"
+
+# Default user management settings
+common_user_name: "devops"
+common_user_groups:
+  - "sudo"

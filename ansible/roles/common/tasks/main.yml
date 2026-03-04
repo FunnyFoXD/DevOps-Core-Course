@@ -1,14 +1,51 @@
 ---
-- name: Update apt cache
-  ansible.builtin.apt:
-    update_cache: yes
-    cache_valid_time: 3600
+- name: Manage common packages
+  block:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
 
-- name: Install common packages
-  ansible.builtin.apt:
-    name: "{{ common_packages }}"
-    state: present
+    - name: Install common packages
+      ansible.builtin.apt:
+        name: "{{ common_packages }}"
+        state: present
+
+  rescue:
+    - name: Fix apt cache issues with --fix-missing
+      ansible.builtin.shell: apt-get update --fix-missing
+      args:
+        warn: false
+
+  always:
+    - name: Log completion of common package management
+      ansible.builtin.file:
+        path: /tmp/common_packages_completed
+        state: touch
+        mode: "0644"
+
+  become: true
+  tags:
+    - common
+    - packages
+
+- name: Manage common users
+  block:
+    - name: Ensure common user exists
+      ansible.builtin.user:
+        name: "{{ common_user_name }}"
+        groups: "{{ common_user_groups }}"
+        append: true
+        state: present
+
+  become: true
+  tags:
+    - common
+    - users
 
 - name: Set timezone
   community.general.timezone:
     name: "{{ common_timezone }}"
+  become: true
+  tags:
+    - common
