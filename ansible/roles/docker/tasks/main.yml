@@ -44,9 +44,9 @@
         cache_valid_time: 3600
       notify: restart docker
   rescue:
-  - name: Retry apt metadata update after Docker GPG failure
-    ansible.builtin.apt:
-      update_cache: true
+    - name: Retry apt metadata update after Docker GPG failure
+      ansible.builtin.apt:
+        update_cache: true
   always:
     - name: Ensure Docker service is enabled and running
       ansible.builtin.service:
@@ -56,6 +56,10 @@
 
 
 - name: Configure Docker users and SDK
+  become: true
+  tags:
+    - docker
+    - docker_config
   block:
     - name: Add user to docker group
       ansible.builtin.user:
@@ -68,7 +72,3 @@
         name: "docker>=7.0.0"
         state: present
 
-  become: true
-  tags:
-    - docker
-    - docker_config
