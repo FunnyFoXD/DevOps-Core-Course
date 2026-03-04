@@ -1,4 +1,4 @@
 ---
-- name: restart app container
+- name: Restart app container
   ansible.builtin.command: docker restart "{{ app_container_name }}"
   changed_when: true

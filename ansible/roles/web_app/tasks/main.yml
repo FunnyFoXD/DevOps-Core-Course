@@ -7,6 +7,10 @@
     - web_app_wipe
 
 - name: Deploy application with Docker Compose
+  become: true
+  tags:
+    - app_deploy
+    - compose
   block:
     - name: Create app directory
       ansible.builtin.file:
@@ -30,8 +34,3 @@
     - name: Handle deployment failure
       ansible.builtin.debug:
         msg: "Deployment of {{ app_name }} failed"
-
-  become: true
-  tags:
-    - app_deploy
-    - compose
