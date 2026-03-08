@@ -80,6 +80,10 @@ pulumi/venv/
 Pulumi.*.yaml
 .pulumi/
 
+# Environment and secrets
+.env
+.env.local
+
 # Cloud credentials
 *.pem
 *.key
