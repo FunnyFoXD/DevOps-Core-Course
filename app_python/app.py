@@ -6,14 +6,16 @@ import os
 import socket
 import platform
 import logging
+import time
 from datetime import datetime, timezone
 from typing import Dict, Any
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
 
 from pythonjsonlogger import jsonlogger
+from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 
 # JSON structured logging
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
@@ -55,6 +57,44 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 START_TIME = datetime.now(timezone.utc)
 
 
+# Prometheus metrics
+http_requests_total = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "endpoint", "status_code"],
+)
+
+http_request_duration_seconds = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request duration in seconds",
+    ["method", "endpoint", "status_code"],
+)
+
+http_requests_in_progress = Gauge(
+    "http_requests_in_progress",
+    "HTTP requests currently being processed",
+    ["method", "endpoint"],
+)
+
+devops_info_endpoint_calls = Counter(
+    "devops_info_endpoint_calls",
+    "DevOps info service endpoint calls",
+    ["endpoint"],
+)
+
+devops_info_system_collection_seconds = Histogram(
+    "devops_info_system_collection_seconds",
+    "System info collection time in seconds",
+)
+
+
+def _endpoint_label(request: Request) -> str:
+    try:
+        return str(request.url.path)
+    except Exception:
+        return "unknown"
+
+
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Log each request and response in structured JSON."""
 
@@ -79,14 +119,43 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 app.add_middleware(RequestLoggingMiddleware)
 
 
+class PrometheusMetricsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        method = request.method
+        endpoint = _endpoint_label(request)
+
+        start = time.perf_counter()
+        http_requests_in_progress.labels(method=method, endpoint=endpoint).inc()
+        try:
+            response = await call_next(request)
+            status_code = response.status_code
+            return response
+        except Exception:
+            status_code = 500
+            raise
+        finally:
+            duration = time.perf_counter() - start
+            http_requests_in_progress.labels(method=method, endpoint=endpoint).dec()
+            http_requests_total.labels(
+                method=method, endpoint=endpoint, status_code=str(status_code)
+            ).inc()
+            http_request_duration_seconds.labels(
+                method=method, endpoint=endpoint, status_code=str(status_code)
+            ).observe(duration)
+
+
+app.add_middleware(PrometheusMetricsMiddleware)
+
+
 def get_system_info() -> Dict[str, Any]:
     """Collect system information"""
+    start = time.perf_counter()
     try:
         platform_info = platform.platform()
     except Exception:
         platform_info = platform.system()
 
-    return {
+    info = {
         'hostname': socket.gethostname(),
         'platform': platform.system(),
         'platform_version': platform_info,
@@ -94,6 +163,8 @@ def get_system_info() -> Dict[str, Any]:
         'cpu_count': os.cpu_count() or 0,
         'python_version': platform.python_version()
     }
+    devops_info_system_collection_seconds.observe(time.perf_counter() - start)
+    return info
 
 
 def get_uptime() -> Dict[str, Any]:
@@ -111,6 +182,7 @@ def get_uptime() -> Dict[str, Any]:
 @app.get("/")
 async def index(request: Request) -> Dict[str, Any]:
     """Main endpoint - service and system information"""
+    devops_info_endpoint_calls.labels(endpoint="/").inc()
     uptime = get_uptime()
 
     # Get client IP
@@ -149,6 +221,7 @@ async def index(request: Request) -> Dict[str, Any]:
 @app.get("/health")
 async def health() -> Dict[str, Any]:
     """Health check endpoint for monitoring"""
+    devops_info_endpoint_calls.labels(endpoint="/health").inc()
     uptime = get_uptime()
 
     return {
@@ -156,6 +229,11 @@ async def health() -> Dict[str, Any]:
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "uptime_seconds": uptime['seconds']
     }
+
+
+@app.get("/metrics")
+async def metrics() -> Response:
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 @app.exception_handler(404)
@@ -210,7 +288,7 @@ if __name__ == "__main__":
         }
     )
     uvicorn.run(
-        "app:app",
+        app,
         host=HOST,
         port=PORT,
         reload=DEBUG,

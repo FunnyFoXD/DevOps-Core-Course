@@ -6,6 +6,7 @@ colorama==0.4.6
 fastapi==0.128.5
 h11==0.16.0
 idna==3.11
+prometheus-client==0.23.1
 pycodestyle==2.14.0
 pydantic==2.12.5
 pydantic_core==2.41.5
