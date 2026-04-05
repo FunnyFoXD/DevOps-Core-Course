@@ -31,3 +31,25 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/name: {{ include "devops-info-service.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/* Kubernetes Secret holding app credentials (Helm-managed) */}}
+{{- define "devops-info-service.secretName" -}}
+{{- printf "%s-secret" (include "devops-info-service.fullname" .) }}
+{{- end }}
+
+{{/* Service account used by the workload (Vault K8s auth binds to this name) */}}
+{{- define "devops-info-service.serviceAccountName" -}}
+{{- if .Values.serviceAccount.name }}
+{{- .Values.serviceAccount.name }}
+{{- else }}
+{{- include "devops-info-service.fullname" . }}
+{{- end }}
+{{- end }}
+
+{{/* Common non-secret container environment variables (DRY for deployment) */}}
+{{- define "devops-info-service.containerEnv" -}}
+- name: HOST
+  value: {{ .Values.env.host | quote }}
+- name: PORT
+  value: {{ .Values.env.port | quote }}
+{{- end }}

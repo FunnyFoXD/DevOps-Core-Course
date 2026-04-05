@@ -19,7 +19,25 @@ spec:
     metadata:
       labels:
         {{- include "devops-info-service.selectorLabels" . | nindent 8 }}
+      {{- if or .Values.vault.enabled (not (empty .Values.podAnnotations)) }}
+      annotations:
+        {{- if .Values.vault.enabled }}
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: {{ .Values.vault.role | quote }}
+        vault.hashicorp.com/agent-inject-secret-config: {{ .Values.vault.secretPath | quote }}
+        {{- if .Values.vault.template.enabled }}
+        vault.hashicorp.com/agent-inject-template-appconfig: |
+{{ .Values.vault.template.body | trim | nindent 10 }}
+        {{- end }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
     spec:
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "devops-info-service.serviceAccountName" . }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -29,10 +47,12 @@ spec:
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
           env:
-            - name: HOST
-              value: {{ .Values.env.host | quote }}
-            - name: PORT
-              value: {{ .Values.env.port | quote }}
+            {{- include "devops-info-service.containerEnv" . | nindent 12 }}
+          {{- if .Values.secrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: {{ include "devops-info-service.secretName" . }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           livenessProbe:

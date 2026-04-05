@@ -1,5 +1,18 @@
 # Kubernetes Deployment Report (Lab 9)
 
+## Lab 11 — Secrets and Vault
+
+Lab 11 (Kubernetes Secrets + Helm secrets + HashiCorp Vault Agent injection) is documented in **[`k8s/SECRETS.md`](SECRETS.md)**. There you will find:
+
+- imperative `kubectl` Secret create / view / base64 decode (with **kind-lab11** evidence);
+- Helm chart pieces: [`devops-info-service/templates/secrets.yaml`](devops-info-service/templates/secrets.yaml), `envFrom` in [`deployment.yaml`](devops-info-service/templates/deployment.yaml), resource limits in [`values.yaml`](devops-info-service/values.yaml);
+- Vault install (official Helm repo **or** GitHub tarball if the repo returns 403), KV v2, Kubernetes auth, policy/role, injector proof under `/vault/secrets/`;
+- bonus (**`SECRETS.md` §6**): `agent-inject-template-appconfig`, rendered `/vault/secrets/appconfig` (kind-lab11 evidence), refresh / `agent-inject-command`, named Helm env template in [`_helpers.tpl`](devops-info-service/templates/_helpers.tpl).
+
+Helm chart path: [`k8s/devops-info-service/`](devops-info-service/). Lab 10 write-up (if present): [`k8s/HELM.md`](HELM.md).
+
+---
+
 ## Architecture Overview
 We deployed the Lab 2 Python FastAPI app (`funnyfoxd/devops-info-service:lab02`) to Kubernetes using declarative manifests.
 

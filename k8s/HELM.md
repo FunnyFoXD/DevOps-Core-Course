@@ -1,5 +1,7 @@
 # Helm Implementation Report (Lab 10)
 
+Lab 11 extends this chart with Kubernetes Secrets, resource tuning, and optional Vault Agent injection — see **[`SECRETS.md`](SECRETS.md)**.
+
 ## 1) Chart Overview
 
 Helm chart is implemented in `k8s/devops-info-service` and replaces Lab 9 static manifests with reusable templates.
@@ -7,12 +9,14 @@ Helm chart is implemented in `k8s/devops-info-service` and replaces Lab 9 static
 Main chart files:
 
 - `Chart.yaml` - chart metadata and versioning
-- `values.yaml` - baseline values (replicas, image, service, resources, probes, hooks)
+- `values.yaml` - baseline values (replicas, image, service, resources, probes, hooks, secrets, vault)
 - `values-dev.yaml` - development overrides
 - `values-prod.yaml` - production overrides
 - `templates/deployment.yaml` - Deployment template
+- `templates/secrets.yaml` - optional Helm-managed Secret (Lab 11)
+- `templates/serviceaccount.yaml` - workload ServiceAccount (Vault K8s auth, Lab 11)
 - `templates/service.yaml` - Service template
-- `templates/_helpers.tpl` - naming and labels helpers
+- `templates/_helpers.tpl` - naming, labels, shared `env` partial (Lab 11)
 - `templates/hooks/pre-install-job.yaml` - pre-install hook job
 - `templates/hooks/post-install-job.yaml` - post-install hook job
 
@@ -28,6 +32,7 @@ Important configurable values:
 - `resources.requests`, `resources.limits`
 - `livenessProbe`, `readinessProbe` (kept enabled and configurable)
 - `hooks.image`, `hooks.preInstall.*`, `hooks.postInstall.*`
+- `secrets.*`, `serviceAccount.*`, `vault.*`, `podAnnotations` (Lab 11 — details in `SECRETS.md`)
 
 Environment files:
 

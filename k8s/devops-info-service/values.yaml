@@ -1,5 +1,28 @@
 replicaCount: 3
 
+serviceAccount:
+  create: true
+  name: ""
+
+secrets:
+  enabled: true
+  username: "changeme-user"
+  password: "changeme-password"
+
+vault:
+  enabled: false
+  role: devops-info-service
+  secretPath: secret/data/devops-info/config
+  template:
+    enabled: false
+    body: |
+      {{- with secret "secret/data/devops-info/config" -}}
+      USERNAME={{ .Data.data.username }}
+      PASSWORD={{ .Data.data.password }}
+      {{- end -}}
+
+podAnnotations: {}
+
 image:
   repository: funnyfoxd/devops-info-service
   tag: lab02
