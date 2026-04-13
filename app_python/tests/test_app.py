@@ -2,6 +2,7 @@
 Unit tests for DevOps Info Service
 """
 from pathlib import Path
+import pytest
 from fastapi.testclient import TestClient
 import app as app_module
 
@@ -10,12 +11,9 @@ app = app_module.app
 client = TestClient(app)
 
 
-def setup_function():
-    temp_path = Path("tests/.tmp/visits")
-    temp_path.parent.mkdir(parents=True, exist_ok=True)
-    if temp_path.exists():
-        temp_path.unlink()
-    app_module.VISITS_FILE = temp_path
+@pytest.fixture(autouse=True)
+def isolate_visits_file(tmp_path):
+    app_module.VISITS_FILE = Path(tmp_path) / "visits"
 
 
 class TestMainEndpoint:
