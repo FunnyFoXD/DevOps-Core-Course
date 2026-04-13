@@ -52,4 +52,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   value: {{ .Values.env.host | quote }}
 - name: PORT
   value: {{ .Values.env.port | quote }}
+- name: DATA_DIR
+  value: {{ .Values.persistence.mountPath | quote }}
 {{- end }}

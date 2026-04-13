@@ -1,10 +1,21 @@
 """
 Unit tests for DevOps Info Service
 """
+from pathlib import Path
 from fastapi.testclient import TestClient
-from app import app
+import app as app_module
+
+app = app_module.app
 
 client = TestClient(app)
+
+
+def setup_function():
+    temp_path = Path("tests/.tmp/visits")
+    temp_path.parent.mkdir(parents=True, exist_ok=True)
+    if temp_path.exists():
+        temp_path.unlink()
+    app_module.VISITS_FILE = temp_path
 
 
 class TestMainEndpoint:
@@ -93,11 +104,27 @@ class TestMainEndpoint:
 
         endpoints = data["endpoints"]
         assert isinstance(endpoints, list)
-        assert len(endpoints) >= 2
+        assert len(endpoints) >= 3
 
         endpoint_paths = [ep["path"] for ep in endpoints]
         assert "/" in endpoint_paths
         assert "/health" in endpoint_paths
+        assert "/visits" in endpoint_paths
+
+
+class TestVisitsEndpoint:
+    """Tests for GET /visits endpoint and persistence logic"""
+
+    def test_visits_endpoint_status_code(self):
+        response = client.get("/visits")
+        assert response.status_code == 200
+
+    def test_visits_counter_increments_on_root(self):
+        client.get("/")
+        client.get("/")
+        response = client.get("/visits")
+        data = response.json()
+        assert data["visits"] == 2
 
 
 class TestHealthEndpoint:

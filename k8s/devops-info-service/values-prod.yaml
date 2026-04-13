@@ -3,6 +3,10 @@ replicaCount: 5
 image:
   tag: "1.0.0"
 
+configEnv:
+  environment: "prod"
+  logLevel: "warn"
+
 service:
   type: LoadBalancer
 

@@ -86,6 +86,11 @@ HOST=127.0.0.1 PORT=3000 python app.py
 HOST=127.0.0.1 PORT=3000 python3 app.py
 ```
 
+#### Custom data directory for visits counter
+```bash
+DATA_DIR=./data python app.py
+```
+
 #### Enable debug mode
 ```bash
 DEBUG=true python app.py
@@ -167,7 +172,8 @@ Returns service and system information
   },
   "endpoints": [
     {"path": "/", "method": "GET", "description": "Service information"},
-    {"path": "/health", "method": "GET", "description": "Health check"}
+    {"path": "/health", "method": "GET", "description": "Health check"},
+    {"path": "/visits", "method": "GET", "description": "Visits counter"}
   ]
 }
 ```
@@ -209,6 +215,38 @@ curl http://localhost:5000/health | jq
 **Screenshot:**
 ![Health Check](docs/screenshots/02-health-check.png)
 
+### `GET /visits`
+
+Returns current persisted visits count from `DATA_DIR/visits`.
+
+**Response Example:**
+```json
+{
+  "visits": 42
+}
+```
+
+**Testing:**
+```bash
+curl http://localhost:5000/visits
+```
+
+## Local persistence with Docker Compose
+
+Use `docker-compose.yml` to persist the counter between restarts:
+
+```bash
+docker compose up --build -d
+curl http://localhost:5000/
+curl http://localhost:5000/
+cat ./data/visits
+docker compose down
+docker compose up -d
+curl http://localhost:5000/visits
+```
+
+The compose file mounts `./data:/data`, and the app stores visits in `/data/visits`.
+
 ## Configuration
 
 The application can be configured using environment variables:
@@ -218,6 +256,7 @@ The application can be configured using environment variables:
 | `HOST` | `0.0.0.0` | Host address to bind the server |
 | `PORT` | `5000` | Port number to listen on |
 | `DEBUG` | `False` | Enable debug mode |
+| `DATA_DIR` | `/data` | Directory where visits file is stored |
 
 ## Testing
 

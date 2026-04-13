@@ -7,8 +7,10 @@ import socket
 import platform
 import logging
 import time
+from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, Any
+from threading import Lock
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -52,6 +54,9 @@ app = FastAPI(
 HOST = os.getenv('HOST', '0.0.0.0')
 PORT = int(os.getenv('PORT', 5000))
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DATA_DIR = os.getenv('DATA_DIR', '/data')
+VISITS_FILE = Path(DATA_DIR) / "visits"
+VISITS_LOCK = Lock()
 
 # Application start time
 START_TIME = datetime.now(timezone.utc)
@@ -179,10 +184,34 @@ def get_uptime() -> Dict[str, Any]:
         'human': f"{hours} hour{'s' if hours != 1 else ''}, {minutes} minute{'s' if minutes != 1 else ''}"}
 
 
+def read_visits() -> int:
+    if not VISITS_FILE.exists():
+        return 0
+    content = VISITS_FILE.read_text(encoding="utf-8").strip()
+    if not content:
+        return 0
+    return int(content)
+
+
+def write_visits(count: int) -> None:
+    VISITS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    tmp_file = VISITS_FILE.with_suffix(".tmp")
+    tmp_file.write_text(str(count), encoding="utf-8")
+    tmp_file.replace(VISITS_FILE)
+
+
+def increment_visits() -> int:
+    with VISITS_LOCK:
+        count = read_visits() + 1
+        write_visits(count)
+        return count
+
+
 @app.get("/")
 async def index(request: Request) -> Dict[str, Any]:
     """Main endpoint - service and system information"""
     devops_info_endpoint_calls.labels(endpoint="/").inc()
+    increment_visits()
     uptime = get_uptime()
 
     # Get client IP
@@ -213,7 +242,8 @@ async def index(request: Request) -> Dict[str, Any]:
         },
         "endpoints": [
             {"path": "/", "method": "GET", "description": "Service information"},
-            {"path": "/health", "method": "GET", "description": "Health check"}
+            {"path": "/health", "method": "GET", "description": "Health check"},
+            {"path": "/visits", "method": "GET", "description": "Visits counter"}
         ]
     }
 
@@ -229,6 +259,14 @@ async def health() -> Dict[str, Any]:
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "uptime_seconds": uptime['seconds']
     }
+
+
+@app.get("/visits")
+async def visits() -> Dict[str, int]:
+    devops_info_endpoint_calls.labels(endpoint="/visits").inc()
+    with VISITS_LOCK:
+        count = read_visits()
+    return {"visits": count}
 
 
 @app.get("/metrics")

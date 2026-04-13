@@ -49,6 +49,18 @@ env:
   host: "0.0.0.0"
   port: "5000"
 
+configEnv:
+  appName: "devops-info-service"
+  environment: "dev"
+  featureVisits: "true"
+  logLevel: "info"
+
+persistence:
+  enabled: true
+  size: 100Mi
+  storageClass: ""
+  mountPath: /data
+
 livenessProbe:
   httpGet:
     path: /health
