@@ -8,7 +8,8 @@ configEnv:
   logLevel: "warn"
 
 service:
-  type: LoadBalancer
+  type: NodePort
+  nodePort: 30081
 
 resources:
   requests:
