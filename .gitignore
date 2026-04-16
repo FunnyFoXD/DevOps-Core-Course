@@ -56,6 +56,10 @@ temp_*.txt
 *.tmp
 *.bak
 
+# Local tool state (do not commit)
+.argocd/
+.helm/
+
 # Go
 *.exe
 *.exe~

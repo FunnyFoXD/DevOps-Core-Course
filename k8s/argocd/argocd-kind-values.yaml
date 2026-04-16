@@ -1,0 +1,10 @@
+global:
+  image:
+    repository: quay.io/argoproj/argocd
+    tag: v2.14.1
+    imagePullPolicy: IfNotPresent
+
+dex:
+  image:
+    repository: dexidp/dex
+    tag: v2.43.1
