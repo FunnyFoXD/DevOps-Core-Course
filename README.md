@@ -135,7 +135,7 @@ Each lab is worth **10 points** (main tasks) + **2.5 points** (bonus).
 
 **Kubernetes Core (Labs 9-12)**
 - K8s basics, Helm
-- Secrets, ConfigMaps
+- Secrets ([`k8s/SECRETS.md`](k8s/SECRETS.md) — Lab 11), ConfigMaps
 
 **Advanced Kubernetes (Labs 13-16)**
 - ArgoCD, Argo Rollouts
