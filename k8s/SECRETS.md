@@ -68,9 +68,9 @@ References: [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configurati
 - Secret template: [`devops-info-service/templates/secrets.yaml`](devops-info-service/templates/secrets.yaml) — creates an `Opaque` Secret when `secrets.enabled` is true, using `stringData` so Helm stores plain literals in the chart values while Kubernetes stores encoded data.
 - Default placeholders: [`devops-info-service/values.yaml`](devops-info-service/values.yaml) under `secrets:` (`username` / `password`). Override at install time with `--set` or a private values file **not** committed to Git.
 
-### How the Deployment consumes the Secret
+### How the workload consumes the Secret
 
-[`devops-info-service/templates/deployment.yaml`](devops-info-service/templates/deployment.yaml) uses `envFrom` with `secretRef` so **all keys** from the chart Secret are exposed as environment variables:
+[`devops-info-service/templates/rollout.yaml`](devops-info-service/templates/rollout.yaml) (Argo Rollouts `Rollout`; Lab 14) uses `envFrom` with `secretRef` so **all keys** from the chart Secret are exposed as environment variables:
 
 ```yaml
 envFrom:
@@ -298,7 +298,7 @@ When `vault.enabled` and `vault.template.enabled` are true, the chart adds `vaul
 
 Rendering in the chart template:
 
-```28:31:k8s/devops-info-service/templates/deployment.yaml
+```24:27:k8s/devops-info-service/templates/rollout.yaml
         {{- if .Values.vault.template.enabled }}
         vault.hashicorp.com/agent-inject-template-appconfig: |
 {{ .Values.vault.template.body | trim | nindent 10 }}
@@ -365,7 +365,7 @@ Vault Agent can **renew** leases and **re-render** files when static secret vers
 
 ### Named Helm template (DRY env block)
 
-Shared non-secret environment variables are defined once and included from the Deployment:
+Shared non-secret environment variables are defined once and included from the Rollout pod template:
 
 ```49:55:k8s/devops-info-service/templates/_helpers.tpl
 {{/* Common non-secret container environment variables (DRY for deployment) */}}
@@ -377,12 +377,12 @@ Shared non-secret environment variables are defined once and included from the D
 {{- end }}
 ```
 
-```49:50:k8s/devops-info-service/templates/deployment.yaml
+```44:45:k8s/devops-info-service/templates/rollout.yaml
           env:
             {{- include "devops-info-service.containerEnv" . | nindent 12 }}
 ```
 
-**Benefit:** any future template (e.g. a second Deployment or a Job) can reuse `include "devops-info-service.containerEnv" .` instead of duplicating `HOST` / `PORT` blocks.
+**Benefit:** any future template (e.g. a Job) can reuse `include "devops-info-service.containerEnv" .` instead of duplicating `HOST` / `PORT` blocks.
 
 ---
 

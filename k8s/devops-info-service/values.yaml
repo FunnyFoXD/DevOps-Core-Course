@@ -36,6 +36,8 @@ service:
   port: 80
   targetPort: 5000
   nodePort: 30080
+  previewType: ClusterIP
+  previewNodePort: 30081
 
 resources:
   requests:
@@ -78,6 +80,32 @@ readinessProbe:
   periodSeconds: 5
   timeoutSeconds: 2
   failureThreshold: 3
+
+# canary | blueGreen — Lab 14 progressive delivery (Argo Rollouts)
+rollout:
+  strategy: canary
+  canary:
+    steps:
+      - setWeight: 20
+      - pause: {}
+      - setWeight: 40
+      - pause:
+          duration: 30s
+      - setWeight: 60
+      - pause:
+          duration: 30s
+      - setWeight: 80
+      - pause:
+          duration: 30s
+      - setWeight: 100
+  blueGreen:
+    autoPromotionEnabled: false
+  # Bonus Lab 14: set enabled: true and add an analysis step to rollout.canary.steps (see k8s/ROLLOUTS.md)
+  analysis:
+    enabled: false
+    interval: 10s
+    count: 3
+    failureLimit: 1
 
 hooks:
   image: busybox:1.36

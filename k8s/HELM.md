@@ -12,7 +12,7 @@ Main chart files:
 - `values.yaml` - baseline values (replicas, image, service, resources, probes, hooks, secrets, vault)
 - `values-dev.yaml` - development overrides
 - `values-prod.yaml` - production overrides
-- `templates/deployment.yaml` - Deployment template
+- `templates/rollout.yaml` - Argo Rollouts `Rollout` (Lab 14; replaces Deployment)
 - `templates/secrets.yaml` - optional Helm-managed Secret (Lab 11)
 - `templates/serviceaccount.yaml` - workload ServiceAccount (Vault K8s auth, Lab 11)
 - `templates/service.yaml` - Service template
