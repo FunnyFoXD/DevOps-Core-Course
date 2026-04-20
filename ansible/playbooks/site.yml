@@ -1,0 +1,4 @@
+---
+# Main playbook - runs provision and deploy
+- import_playbook: provision.yml
+- import_playbook: deploy.yml

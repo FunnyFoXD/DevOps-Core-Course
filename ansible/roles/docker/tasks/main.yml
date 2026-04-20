@@ -1,0 +1,51 @@
+---
+- name: Create apt keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Download Docker GPG key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+    force: yes
+
+- name: Convert Docker GPG key to keyring format
+  ansible.builtin.shell: |
+    gpg --dearmor -o /etc/apt/keyrings/docker.gpg < /etc/apt/keyrings/docker.asc
+  args:
+    creates: /etc/apt/keyrings/docker.gpg
+
+- name: Add Docker APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ ansible_architecture | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    filename: docker
+    state: present
+
+- name: Install Docker packages
+  ansible.builtin.apt:
+    name: "{{ docker_packages }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  notify: restart docker
+
+- name: Ensure Docker service is running and enabled
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add user to docker group
+  ansible.builtin.user:
+    name: "{{ docker_group_user }}"
+    groups: docker
+    append: yes
+
+- name: Install Docker Python SDK for Ansible docker modules
+  ansible.builtin.pip:
+    name: "docker>=7.0.0"
+    state: present
+  become: yes
