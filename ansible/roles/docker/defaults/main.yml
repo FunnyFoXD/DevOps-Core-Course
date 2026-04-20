@@ -1,0 +1,9 @@
+---
+# User to add to docker group (default: current Ansible user)
+docker_group_user: "{{ ansible_user }}"
+
+# Docker package list
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io

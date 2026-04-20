@@ -1,0 +1,23 @@
+# IDE and Editor files
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.Python
+
+# Environment variables and logs
+venv/
+env/
+ENV/
+*.log
+
+# Test files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
