@@ -1,0 +1,28 @@
+replicaCount: 5
+
+image:
+  tag: lab02
+
+configEnv:
+  environment: "prod"
+  logLevel: "warn"
+
+service:
+  type: NodePort
+  nodePort: 30081
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 5
+
+readinessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 3

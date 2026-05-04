@@ -1,0 +1,2 @@
+# Create encrypted secrets: ansible-vault create group_vars/all.yml
+# Use all.yml.example as template. Add .vault_pass to .gitignore.

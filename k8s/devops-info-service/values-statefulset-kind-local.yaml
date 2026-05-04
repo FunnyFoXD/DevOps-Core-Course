@@ -1,0 +1,4 @@
+image:
+  repository: devops-info-service
+  tag: lab15-local
+  pullPolicy: Never

@@ -1,0 +1,4 @@
+image:
+  repository: devops-info-service
+  tag: lab16-metrics
+  pullPolicy: Never
