@@ -115,6 +115,29 @@ rollout:
     count: 3
     failureLimit: 1
 
+# Lab 16: init containers
+initContainers:
+  enabled: false
+  download:
+    enabled: true
+    image: busybox:1.36
+    url: https://example.com
+    outputFile: index.html
+  waitForService:
+    enabled: true
+    image: busybox:1.36
+    host: ""
+  workVolume:
+    name: init-workdir
+    mountPath: /init-data
+
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  scrapeTimeout: 10s
+  labels:
+    release: monitoring
+
 hooks:
   image: busybox:1.36
   preInstall:

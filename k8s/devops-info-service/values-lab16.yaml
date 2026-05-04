@@ -1,0 +1,11 @@
+# Lab 16: enable init containers + ServiceMonitor
+service:
+  type: ClusterIP
+
+initContainers:
+  enabled: true
+
+serviceMonitor:
+  enabled: true
+  labels:
+    release: monitoring

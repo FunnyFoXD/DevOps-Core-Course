@@ -34,6 +34,34 @@ spec:
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ include "devops-info-service.serviceAccountName" . }}
       {{- end }}
+      {{- if and .Values.initContainers.enabled (or .Values.initContainers.waitForService.enabled .Values.initContainers.download.enabled) }}
+      initContainers:
+        {{- if .Values.initContainers.waitForService.enabled }}
+        - name: wait-for-service
+          image: {{ .Values.initContainers.waitForService.image | quote }}
+          command:
+            - sh
+            - -c
+            - |
+              host="{{ coalesce .Values.initContainers.waitForService.host (printf "%s.%s.svc.cluster.local" (include "devops-info-service.fullname" .) .Release.Namespace) }}"
+              until nslookup "$host" >/dev/null 2>&1; do
+                echo "waiting for $host"
+                sleep 2
+              done
+              echo "resolved $host"
+        {{- end }}
+        {{- if .Values.initContainers.download.enabled }}
+        - name: init-download
+          image: {{ .Values.initContainers.download.image | quote }}
+          command:
+            - sh
+            - -c
+            - wget -q -O "/work-dir/{{ .Values.initContainers.download.outputFile }}" "{{ .Values.initContainers.download.url }}" && ls -la /work-dir
+          volumeMounts:
+            - name: {{ .Values.initContainers.workVolume.name }}
+              mountPath: /work-dir
+        {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -57,6 +85,10 @@ spec:
               readOnly: true
             - name: data-volume
               mountPath: {{ .Values.persistence.mountPath }}
+            {{- if and .Values.initContainers.enabled .Values.initContainers.download.enabled }}
+            - name: {{ .Values.initContainers.workVolume.name }}
+              mountPath: {{ .Values.initContainers.workVolume.mountPath | quote }}
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           livenessProbe:
@@ -74,6 +106,10 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- if and .Values.initContainers.enabled .Values.initContainers.download.enabled }}
+        - name: {{ .Values.initContainers.workVolume.name }}
+          emptyDir: {}
+        {{- end }}
   strategy:
     {{- if eq .Values.rollout.strategy "blueGreen" }}
     blueGreen:
