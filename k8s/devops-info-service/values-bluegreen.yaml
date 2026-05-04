@@ -1,0 +1,4 @@
+rollout:
+  strategy: blueGreen
+  blueGreen:
+    autoPromotionEnabled: false

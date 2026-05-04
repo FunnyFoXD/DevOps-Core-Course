@@ -1,0 +1,12 @@
+apiVersion: v2
+name: devops-info-service
+description: Helm chart for deploying devops-info-service from Lab 9
+type: application
+version: 0.1.0
+appVersion: "lab02"
+keywords:
+  - devops
+  - fastapi
+  - kubernetes
+maintainers:
+  - name: funnyfox
