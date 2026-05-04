@@ -1,0 +1,127 @@
+replicaCount: 3
+
+serviceAccount:
+  create: true
+  name: ""
+
+secrets:
+  enabled: true
+  username: "changeme-user"
+  password: "changeme-password"
+
+vault:
+  enabled: false
+  role: devops-info-service
+  secretPath: secret/data/devops-info/config
+  template:
+    enabled: false
+    body: |
+      {{- with secret "secret/data/devops-info/config" -}}
+      USERNAME={{ .Data.data.username }}
+      PASSWORD={{ .Data.data.password }}
+      {{- end -}}
+
+podAnnotations: {}
+
+image:
+  repository: funnyfoxd/devops-info-service
+  tag: lab02
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 5000
+  nodePort: 30080
+  previewType: ClusterIP
+  previewNodePort: 30081
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+env:
+  host: "0.0.0.0"
+  port: "5000"
+
+configEnv:
+  appName: "devops-info-service"
+  environment: "dev"
+  featureVisits: "true"
+  logLevel: "info"
+
+persistence:
+  enabled: true
+  size: 100Mi
+  storageClass: ""
+  mountPath: /data
+
+# Lab 15: StatefulSet + per-pod PVC (headless service). When true, Rollout is not rendered.
+statefulset:
+  enabled: false
+  # RollingUpdate (default) | OnDelete — bonus: OnDelete updates pods only after manual delete
+  updateStrategy: RollingUpdate
+  # Pods with ordinal >= partition get the new spec first; 0 = update all (see k8s/STATEFULSET.md)
+  partition: 0
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+# canary | blueGreen — Lab 14 progressive delivery (Argo Rollouts)
+rollout:
+  strategy: canary
+  canary:
+    steps:
+      - setWeight: 20
+      - pause: {}
+      - setWeight: 40
+      - pause:
+          duration: 30s
+      - setWeight: 60
+      - pause:
+          duration: 30s
+      - setWeight: 80
+      - pause:
+          duration: 30s
+      - setWeight: 100
+  blueGreen:
+    autoPromotionEnabled: false
+  # Bonus Lab 14: set enabled: true and add an analysis step to rollout.canary.steps (see k8s/ROLLOUTS.md)
+  analysis:
+    enabled: false
+    interval: 10s
+    count: 3
+    failureLimit: 1
+
+hooks:
+  image: busybox:1.36
+  preInstall:
+    enabled: true
+    weight: -5
+    command: "echo Pre-install validation for devops-info-service && sleep 3 && echo Pre-install completed"
+  postInstall:
+    enabled: true
+    weight: 5
+    command: "echo Post-install smoke check for devops-info-service && sleep 3 && echo Post-install completed"
