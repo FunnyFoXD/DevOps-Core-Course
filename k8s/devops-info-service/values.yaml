@@ -63,6 +63,14 @@ persistence:
   storageClass: ""
   mountPath: /data
 
+# Lab 15: StatefulSet + per-pod PVC (headless service). When true, Rollout is not rendered.
+statefulset:
+  enabled: false
+  # RollingUpdate (default) | OnDelete — bonus: OnDelete updates pods only after manual delete
+  updateStrategy: RollingUpdate
+  # Pods with ordinal >= partition get the new spec first; 0 = update all (see k8s/STATEFULSET.md)
+  partition: 0
+
 livenessProbe:
   httpGet:
     path: /health
