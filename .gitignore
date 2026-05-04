@@ -92,6 +92,9 @@ Pulumi.*.yaml
 *.pem
 *.key
 *.json  # Service account keys
+!/edge-api/package.json
+!/edge-api/package-lock.json
+!/edge-api/tsconfig.json
 credentials
 .aws/
 .gcp/
